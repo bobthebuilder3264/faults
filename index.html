@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Aircraft Fault Guide</title>
   <link rel="manifest" href="manifest.json" />
   <style>
@@ -14,21 +14,36 @@
     .fault {
       padding: 8px; border: 1px solid #ccc;
       margin-bottom: 6px; cursor: pointer;
-      border-radius: 4px;
+      border-radius: 4px; display: flex;
+      justify-content: space-between; align-items: center;
     }
     .fault:hover { background: #f0f0f0; }
     .desc { display: none; margin-top: 10px; }
-    button { padding: 6px 12px; margin-top: 10px; }
+    button { padding: 6px 12px; margin: 4px 4px 10px 0; }
+    .badge {
+      display: inline-block; padding: 2px 6px; border-radius: 3px;
+      font-size: 12px; color: #fff; margin-left: 8px;
+    }
+    .advisory { background-color: cyan; color: black; }
+    .caution { background-color: orange; color: black; }
+    .warning { background-color: red; }
+    .controls { margin-bottom: 10px; }
   </style>
 </head>
 <body>
   <h1>Aircraft Fault Guide</h1>
   <input type="search" id="search" placeholder="Search faults..." oninput="filterFaults()" />
+
+  <div class="controls">
+    <button onclick="sortBy('level')">Sort by Warning Level</button>
+    <button onclick="sortBy('ata')">Sort by ATA Chapter</button>
+    <button onclick="resetSort()">Reset Sort</button>
+  </div>
+
   <div id="faultList"></div>
   <div id="descPage" class="desc"></div>
 
   <script>
-    // 👇 EDIT YOUR FAULTS HERE — only in this array!
     const faults = [
       {
         id: 'f1',
@@ -36,7 +51,9 @@
         title: 'HYD PUMP LOW PRESSURE',
         description: 'Hydraulic pump output below threshold.',
         cause: 'Pump fault or hydraulic leak.',
-        cb: 'Pull CB HYD PUMP 1'
+        cb: 'Pull CB HYD PUMP 1',
+        level: 'advisory',
+        ata: '29'
       },
       {
         id: 'f2',
@@ -44,7 +61,9 @@
         title: 'APU FIRE DETECTOR LOOP FAIL',
         description: 'APU loop fault detected.',
         cause: 'Sensor wiring short.',
-        cb: 'Pull CB FIRE LOOP 1'
+        cb: 'Pull CB FIRE LOOP 1',
+        level: 'warning',
+        ata: '26'
       },
       {
         id: 'f3',
@@ -52,50 +71,76 @@
         title: 'FUEL QTY IMBALANCE',
         description: 'Fuel quantity imbalance between tanks.',
         cause: 'Fuel transfer pump failure.',
-        cb: 'Pull CB FUEL TRANSFER 1'
+        cb: 'Pull CB FUEL TRANSFER 1',
+        level: 'caution',
+        ata: '28'
       }
-      // 👉 Add more faults here (just copy format)
+      // Add more faults here
     ];
 
-    // Build fault list
-    const faultList = document.getElementById('faultList');
-    faults.forEach(f => {
-      const div = document.createElement('div');
-      div.className = 'fault';
-      div.textContent = `${f.code}: ${f.title}`;
-      div.onclick = () => showDesc(f);
-      faultList.appendChild(div);
-    });
+    let currentFaults = [...faults];
+
+    function buildList() {
+      const faultList = document.getElementById('faultList');
+      faultList.innerHTML = '';
+      currentFaults.forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'fault';
+        div.innerHTML = `
+          <span>${f.code}: ${f.title} <span class="badge ${f.level}">${f.level[0].toUpperCase()}</span> <span style="font-size: 12px; color: gray;">[ATA ${f.ata}]</span></span>
+        `;
+        div.onclick = () => showDesc(f);
+        faultList.appendChild(div);
+      });
+    }
 
     function filterFaults() {
       const q = document.getElementById('search').value.toLowerCase();
       document.querySelectorAll('.fault').forEach(el => {
-        el.style.display = el.textContent.toLowerCase().includes(q) ? 'block' : 'none';
+        el.style.display = el.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
       });
     }
 
     function showDesc(fault) {
-      faultList.style.display = 'none';
+      document.getElementById('faultList').style.display = 'none';
       const desc = document.getElementById('descPage');
       desc.innerHTML = `
         <h2>${fault.code}: ${fault.title}</h2>
         <p><strong>Description:</strong> ${fault.description}</p>
         <p><strong>Cause:</strong> ${fault.cause}</p>
         <p><strong>CB:</strong> ${fault.cb}</p>
+        <p><strong>Warning Level:</strong> ${fault.level}</p>
+        <p><strong>ATA Chapter:</strong> ${fault.ata}</p>
         <button onclick="goBack()">Back</button>
       `;
       desc.style.display = 'block';
     }
 
     function goBack() {
-      faultList.style.display = 'block';
+      document.getElementById('faultList').style.display = 'block';
       document.getElementById('descPage').style.display = 'none';
     }
 
-    // PWA Service Worker
+    function sortBy(type) {
+      if (type === 'level') {
+        const order = { 'advisory': 1, 'caution': 2, 'warning': 3 };
+        currentFaults.sort((a, b) => order[a.level] - order[b.level]);
+      } else if (type === 'ata') {
+        currentFaults.sort((a, b) => parseInt(a.ata) - parseInt(b.ata));
+      }
+      buildList();
+    }
+
+    function resetSort() {
+      currentFaults = [...faults];
+      buildList();
+    }
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
     }
+
+    buildList();
   </script>
 </body>
 </html>
