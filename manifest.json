@@ -1,0 +1,15 @@
+{
+  "name": "Aircraft Fault Guide",
+  "short_name": "Fault Guide",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "description": "Offline Aircraft Fault Message Guide",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

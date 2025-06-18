@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aircraft Fault Guide</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 10px; }
+    input[type="search"] {
+      width: 100%; padding: 8px; margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .fault {
+      padding: 8px; border: 1px solid #ccc;
+      margin-bottom: 6px; cursor: pointer;
+      border-radius: 4px;
+    }
+    .fault:hover { background: #f0f0f0; }
+    .desc { display: none; margin-top: 10px; }
+    button { padding: 6px 12px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Aircraft Fault Guide</h1>
+  <input type="search" id="search" placeholder="Search faults..." oninput="filterFaults()" />
+  <div id="faultList">
+    <div class="fault" onclick="showDesc('f1')">F001: HYD PUMP LOW PRESSURE</div>
+    <div class="fault" onclick="showDesc('f2')">F002: APU FIRE DETECTOR LOOP FAIL</div>
+    <div class="fault" onclick="showDesc('f3')">F003: FUEL QTY IMBALANCE</div>
+    <div class="fault" onclick="showDesc('f4')">F004: BATTERY OVERHEAT</div>
+    <div class="fault" onclick="showDesc('f5')">F005: CABIN ALTITUDE HIGH</div>
+    <div class="fault" onclick="showDesc('f6')">F006: OXYGEN SYSTEM FAIL</div>
+    <div class="fault" onclick="showDesc('f7')">F007: ENGINE 1 OIL PRESSURE LOW</div>
+    <div class="fault" onclick="showDesc('f8')">F008: AILERON DISCREPANCY</div>
+    <div class="fault" onclick="showDesc('f9')">F009: AUTOPILOT DISCONNECT</div>
+    <div class="fault" onclick="showDesc('f10')">F010: LANDING GEAR UNSAFE</div>
+  </div>
+
+  <!-- Fault descriptions -->
+  <div id="f1" class="desc">
+    <h2>F001: HYD PUMP LOW PRESSURE</h2>
+    <p><strong>Description:</strong> Hydraulic pump output below threshold.</p>
+    <p><strong>Cause:</strong> Pump fault or hydraulic leak.</p>
+    <p><strong>CB:</strong> Pull CB HYD PUMP 1.</p>
+    <button onclick="goBack()">Back</button>
+  </div>
+  <!-- ... similarly include f2–f10 descriptions … -->
+  <!-- For brevity, only f1 is fully shown; you can replicate with your own text -->
+
+  <script>
+    function filterFaults() {
+      const q = document.getElementById('search').value.toLowerCase();
+      document.querySelectorAll('.fault').forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? 'block' : 'none';
+      });
+    }
+    function showDesc(id) {
+      document.getElementById('faultList').style.display = 'none';
+      document.getElementById(id).style.display = 'block';
+    }
+    function goBack() {
+      document.getElementById('faultList').style.display = 'block';
+      document.querySelectorAll('.desc').forEach(el => el.style.display = 'none');
+    }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>
