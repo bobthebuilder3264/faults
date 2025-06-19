@@ -1,5 +1,11 @@
 self.addEventListener('install', e => {
-  const files = ['/', '/index.html', '/manifest.json', '/service-worker.js', '/icon.png'];
+  const files = [
+  '/trial/',
+  '/trial/index.html',
+  '/trial/manifest.json',
+  '/trial/service-worker.js',
+  '/trial/icon.png'
+];
   e.waitUntil(caches.open('fault-cache').then(c => c.addAll(files)));
 });
 self.addEventListener('fetch', e => {
