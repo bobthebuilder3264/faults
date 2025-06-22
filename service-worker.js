@@ -4,7 +4,7 @@ self.addEventListener('install', e => {
     '/index.html',
     '/manifest.json',
     '/service-worker.js',
-    '/logo.png'
+    '/app_icon.png'
   ];
   e.waitUntil(
     caches.open('fault-cache-v2').then(c => c.addAll(files))
