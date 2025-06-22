@@ -9,12 +9,13 @@
   <style>
     body { font-family: Arial, sans-serif; padding: 10px; }
     .btn { margin: 5px; padding: 8px 12px; border-radius: 5px; cursor: pointer; background: #ddd; }
-    .advisory { color: cyan; }
-    .caution { color: orange; }
-    .warning { color: red; }
-    .fault { margin: 8px 0; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+    .badge { font-weight: bold; color: white; padding: 2px 6px; border-radius: 4px; margin-right: 5px; }
+    .advisory-badge { background-color: cyan; color: black; }
+    .caution-badge { background-color: orange; }
+    .warning-badge { background-color: red; }
+    .fault { margin: 8px 0; padding: 8px; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; }
     .hidden { display: none; }
-    #backBtn { margin-bottom: 10px; display: block; }
+    #backAircraftBtn { margin-bottom: 10px; display: block; }
   </style>
 </head>
 <body>
@@ -22,7 +23,9 @@
 <h1 id="header">Aircraft Fault Guide</h1>
 
 <div id="aircraftSelect"></div>
+
 <div id="controls" class="hidden">
+  <button class="btn" id="backAircraftBtn" onclick="goBackToAircraft()">← Back to Aircraft Type</button>
   <input type="text" id="search" placeholder="Search faults..." />
   <button class="btn" onclick="sortByLevel()">Sort by Level</button>
   <button class="btn" onclick="sortByATA()">Sort by ATA</button>
@@ -34,10 +37,12 @@
 
 <script>
 const SHEET_ID = '1_iMw2vlZMdcb4aOcauyyO1gRQiIHIVCN_BeJraJ0rTg';
-const TABS = ['5000', '6500']; // Add more aircraft types here
+const TABS = ['5000', '6500'];
 let currentData = [];
+let currentTab = '';
 
 function fetchSheet(tabName) {
+  currentTab = tabName;
   const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${tabName}`;
   fetch(URL)
     .then(res => res.text())
@@ -55,6 +60,7 @@ function fetchSheet(tabName) {
           ata: c[6]
         };
       });
+      document.getElementById('header').textContent = `Aircraft Type: ${tabName} Faults`;
       showFaultList(currentData);
     });
 }
@@ -77,15 +83,24 @@ function showAircraftSelect() {
 
 function showFaultList(data) {
   const list = document.getElementById('faultList');
+  list.classList.remove('hidden');
   list.innerHTML = '';
-  data.forEach((item, i) => {
-    const levelClass = (item.level.toLowerCase());
+  data.forEach(item => {
+    const badge = getLevelBadge(item.level);
     const div = document.createElement('div');
-    div.className = `fault ${levelClass}`;
-    div.innerHTML = `<strong>[${item.code}]</strong> ${item.title}`;
+    div.className = 'fault';
+    div.innerHTML = `${badge}<strong>[${item.code}]</strong> ${item.title}`;
     div.onclick = () => showDetails(item);
     list.appendChild(div);
   });
+}
+
+function getLevelBadge(level) {
+  const lvl = level.toLowerCase();
+  if (lvl.includes('advisory')) return '<span class="badge advisory-badge">A</span>';
+  if (lvl.includes('caution')) return '<span class="badge caution-badge">C</span>';
+  if (lvl.includes('warning')) return '<span class="badge warning-badge">W</span>';
+  return '';
 }
 
 function showDetails(item) {
@@ -94,12 +109,12 @@ function showDetails(item) {
   const details = document.getElementById('faultDetails');
   details.classList.remove('hidden');
   details.innerHTML = `
-    <button class="btn" id="backBtn" onclick="goBack()">← Back</button>
+    <button class="btn" onclick="goBack()">← Back</button>
     <h2>${item.code} - ${item.title}</h2>
     <p><strong>Description:</strong> ${item.description}</p>
     <p><strong>Cause:</strong> ${item.cause}</p>
     <p><strong>CB:</strong> ${item.cb}</p>
-    <p><strong>Level:</strong> <span class="${item.level.toLowerCase()}">${item.level}</span></p>
+    <p><strong>Level:</strong> ${getLevelBadge(item.level)} ${item.level}</p>
     <p><strong>ATA:</strong> ${item.ata}</p>
   `;
 }
@@ -108,6 +123,16 @@ function goBack() {
   document.getElementById('faultDetails').classList.add('hidden');
   document.getElementById('faultList').classList.remove('hidden');
   document.getElementById('controls').classList.remove('hidden');
+}
+
+function goBackToAircraft() {
+  currentData = [];
+  currentTab = '';
+  document.getElementById('header').textContent = 'Aircraft Fault Guide';
+  document.getElementById('aircraftSelect').classList.remove('hidden');
+  document.getElementById('controls').classList.add('hidden');
+  document.getElementById('faultList').classList.add('hidden');
+  document.getElementById('faultList').innerHTML = '';
 }
 
 function sortByLevel() {
