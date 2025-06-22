@@ -1,7 +1,7 @@
 {
   "name": "Aircraft Fault Guide",
   "short_name": "Fault Guide",
-  "start_url": ".",
+  "start_url": "/faults/",
   "display": "standalone",
   "background_color": "#ffffff",
   "description": "Offline Aircraft Fault Message Guide",
