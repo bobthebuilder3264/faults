@@ -49,7 +49,7 @@ function fetchSheet(tabName) {
     .then(text => {
       const json = JSON.parse(text.substr(47).slice(0, -2));
       currentData = json.table.rows.map(r => {
-        const c = r.c.map(e => e ? e.v : '');
+        const c = r.c.map(e => e ? e.v.toString().trim() : '');
         return {
           code: c[0],
           title: c[1],
@@ -89,7 +89,7 @@ function showFaultList(data) {
     const badge = getLevelBadge(item.level);
     const div = document.createElement('div');
     div.className = 'fault';
-    div.innerHTML = `${badge}<strong>[${item.code}]</strong> ${item.title}`;
+    div.innerHTML = `${badge}<strong>[${item.code}]</strong> ${item.title} <em>(ATA ${item.ata})</em>`;
     div.onclick = () => showDetails(item);
     list.appendChild(div);
   });
