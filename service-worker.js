@@ -7,7 +7,7 @@ self.addEventListener('install', e => {
     '/app_icon.png'
   ];
   e.waitUntil(
-    caches.open('fault-cache-v2').then(c => c.addAll(files))
+    caches.open('fault-cache-v3').then(c => c.addAll(files))
   );
 });
 
