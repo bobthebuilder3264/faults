@@ -60,8 +60,21 @@ function fetchSheet(tabName) {
           ata: c[6]
         };
       });
+      localStorage.setItem(`faults-${currentTab}`, JSON.stringify(currentData));
       document.getElementById('header').textContent = `Aircraft Type: ${tabName} Faults`;
       showFaultList(currentData);
+    })
+    .catch(err => {
+      console.warn('Failed to fetch online — loading from cache', err);
+      const cached = localStorage.getItem(`faults-${tabName}`);
+      if (cached) {
+        currentData = JSON.parse(cached);
+        document.getElementById('header').textContent = `Aircraft Type: ${tabName} Faults (Offline)`;
+        showFaultList(currentData);
+      } else {
+        document.getElementById('header').textContent = `Aircraft Type: ${tabName} — No offline data available`;
+        document.getElementById('faultList').innerHTML = '<p>No cached data — please go online once to load faults.</p>';
+      }
     });
 }
 
