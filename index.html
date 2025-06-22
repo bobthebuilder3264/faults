@@ -89,7 +89,7 @@ function showFaultList(data) {
     const badge = getLevelBadge(item.level);
     const div = document.createElement('div');
     div.className = 'fault';
-    div.innerHTML = `${badge}<strong>[${item.code}]</strong> ${item.title} <em>(ATA ${item.ata})</em>`;
+    div.innerHTML = `${badge}${item.title} <em>(ATA ${item.ata})</em>`;
     div.onclick = () => showDetails(item);
     list.appendChild(div);
   });
