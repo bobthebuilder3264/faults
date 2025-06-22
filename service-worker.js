@@ -1,10 +1,10 @@
 self.addEventListener('install', e => {
   const files = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    '/service-worker.js',
-    '/app_icon.png'
+    '/faults/',
+    '/faults/index.html',
+    '/faults/manifest.json',
+    '/faults/service-worker.js',
+    '/faults/app_icon.png'
   ];
   e.waitUntil(
     caches.open('fault-cache-v3').then(c => c.addAll(files))
