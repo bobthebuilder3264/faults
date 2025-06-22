@@ -7,7 +7,7 @@
   "description": "Offline Aircraft Fault Message Guide",
   "icons": [
     {
-      "src": "logo.png",
+      "src": "app_icon.png",
       "sizes": "192x192",
       "type": "image/png"
     }
